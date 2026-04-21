@@ -82,9 +82,9 @@ Nurses at Wexner Medical Center specifically requested:
 
 ```
 ┌──────────────────────────────────────────────────────┐
-│                   Arduino Mega 2560                   │
+│                   Arduino Mega 2560                  |
 │                                                      │
-│  Load Cell → HX711 ADC → weight filtering → volume  │
+│  Load Cell → HX711 ADC → weight filtering → volume   │
 │                                                      │
 │  AS7341 color sensor → spectral calibration          │
 │                       → color classification         │
@@ -281,18 +281,30 @@ All alerts require acknowledgement via the **DISMISS** button. Alerts repeat as 
 
 ### Time Sync
 
-The Arduino does not have a real-time clock (RTC) module. Time is synced by sending a Unix timestamp over Serial from a Python script running on a connected laptop. The Arduino reads any all-numeric line from Serial and sets its internal clock using `TimeLib`. The timezone offset (`TIMEZONE_OFFSET_SECONDS`, currently `-4 * 3600` for EDT) is applied at sync time.
+The Arduino does not have a real-time clock (RTC) module. Time is synced by sending a Unix timestamp over Serial from a Python script running on a connected laptop. The Arduino reads any all-numeric line from Serial and sets its internal clock using `TimeLib`.
 
-A simple Python sync script looks like:
+Our simple Python sync script can be found in this repository, it looks like:
 ```python
-import serial, time
-ser = serial.Serial('COM_PORT', 9600)
-time.sleep(2)
-ser.write((str(int(time.time())) + '\n').encode())
-ser.close()
+import serial
+import time
+from datetime import datetime
+
+# CHANGE THIS to your actual Arduino port
+ser = serial.Serial('COM9', 9600, timeout=1)
+
+time.sleep(2)  # allow Arduino to reset
+
+while True:
+    now = int(datetime.now().timestamp())  # Unix time
+    ser.write(f"{now}\n".encode())
+
+    print(f"Sent: {now}")
+    time.sleep(1)
 ```
 
-Replace `COM_PORT` with the correct port (`/dev/ttyUSB0` on Linux, `COMx` on Windows). The Arduino auto-detects numeric input and applies the time immediately.
+By opening a terminal window and changing directory to where `send_time.py` is located, run the command `python send_time.py` (make sure python is installed on your computer). The script will begin sending UNIX time to the Arduino and the alerts/output log section of the screen should update to include timestamps.
+
+Note: serial monitor must for the Arduino must be available when the Python script is ran (cannot have serial monitor open in Arduino IDE at that time).
 
 ---
 
