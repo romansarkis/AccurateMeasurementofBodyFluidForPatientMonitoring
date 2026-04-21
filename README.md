@@ -304,7 +304,7 @@ while True:
 
 By opening a terminal window and changing directory to where `send_time.py` is located, run the command `python send_time.py` (make sure python is installed on your computer). The script will begin sending UNIX time to the Arduino and the alerts/output log section of the screen should update to include timestamps.
 
-Note: serial monitor must for the Arduino must be available when the Python script is ran (cannot have serial monitor open in Arduino IDE at that time).
+Note: serial monitor must for the Arduino must be available when the Python script is ran (cannot have serial monitor open in Arduino IDE at that time). You will also need TimeLib installed in your libraries folder (Time.zip in this repository)
 
 ---
 
